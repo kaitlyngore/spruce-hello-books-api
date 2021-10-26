@@ -10,6 +10,7 @@ def create_app(test_config=None):
 
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:postgres@localhost:5432/hello_books_development'
+    app.config['SQLALCHEMY_ECHO'] = True 
 
     # Import models here
     from app.models.book import Book

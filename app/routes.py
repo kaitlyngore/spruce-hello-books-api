@@ -32,16 +32,47 @@ def handle_books():
             )
         return jsonify(books_response)
 
-@books_bp.route("/<book_id>", methods=["GET"])
+@books_bp.route("/<book_id>", methods=["GET", "PUT", "PATCH", "DELETE"])
 def handle_book(book_id):
-
-    book = Book.query.get(book_id)
+    book = Book.query.get_or_404(book_id)
 
     if book is None:
         return make_response(f"Book {book_id} not found", 404)
 
-    return {
-        "id": book.id,
-        "title": book.title,
-        "description": book.description,
-        }
+    if request.method == "GET":
+
+        return {
+            "id": book.id,
+            "title": book.title,
+            "description": book.description,
+            }
+
+    elif request.method == "PUT":
+        request_body = request.get_json()
+
+        book.title = request_body["title"]
+        book.description = request_body["description"]
+
+        db.session.commit()
+
+        return jsonify(f"Book #{book.id} sucessfully updated"), 200
+
+    elif request.method == "PATCH":
+        request_body = request.get_json()
+
+        if "title" in request_body:
+            book.title = request_body["title"]
+
+        if "description" in request_body:
+            book.description = request_body["description"]
+
+        db.session.commit()
+
+        return jsonify(f"Book #{book.id} sucessfully patched"), 200
+
+    elif request.method == "DELETE":
+        db.session.delete(book)
+        db.session.commit()
+        return jsonify(f"Book #{book.id} sucessfully deleted"), 200
+
+        
